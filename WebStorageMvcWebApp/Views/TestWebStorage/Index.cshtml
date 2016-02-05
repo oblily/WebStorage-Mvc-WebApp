@@ -1,0 +1,94 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        This is a test page to use WebStorage
+    </div>
+    Comment<input id="comment" type="text">
+    <table>
+        <tr>
+            <th>SessionStorage</th>
+            <td>
+                <input id="session" type="text" size="50" readonly>
+            </td>
+        </tr>
+        <tr>
+            <th>LocalStorage</th>
+            <td>
+                <input id="local" type="text" size="50" readonly>
+            </td>
+        </tr>
+    </table>
+    <button type="button" id="deleteBtn" onclick="deleteWebStorage()"><span>削除WebStorage</span></button>
+
+    <script language="javascript" type="text/javascript">
+
+        var COMMENT = 'comment';
+        var SESSION = 'session';
+        var LOCAL = 'local';
+        var NAME = 'name';
+
+        var commentTextBox;
+        var sessionTextBox;
+        var localTextBox;
+
+        function initialize() {
+            // 初期処理
+            commentTextBox = document.getElementById(COMMENT);
+            sessionTextBox = document.getElementById(SESSION);
+            localTextBox = document.getElementById(LOCAL);
+
+            // 初期表示時にストレージに設定されている値をセットします
+            // sessionStorage,localStorage というキーワードは予約されています
+            setComment(sessionStorage, sessionTextBox);
+            setComment(localStorage, localTextBox);
+
+            //初期データ投入
+            sessionStorage.setItem(NAME, SESSION);
+            localStorage.setItem(NAME, LOCAL);
+
+            // コメントが更新されるたびにストレージを更新する
+            commentTextBox.addEventListener('keyup', function (event) {
+                localStorage.setItem(COMMENT, commentTextBox.value);
+                sessionStorage.setItem(COMMENT, commentTextBox.value);
+
+                //同時にテキストにストレージの値をセットします
+                setComment(sessionStorage, sessionTextBox);
+                setComment(localStorage, localTextBox);
+            }, false);
+        }
+
+        window.onload = function () {
+            initialize();
+        }
+        // Storageイベントが発生したらハンドリングする
+        window.onstorage = function (event) {
+            if (event.storageArea.getItem(NAME) == LOCAL) {
+                localTextBox.value = event.newValue;
+            } else if (event.storageArea.getItem(NAME) == SESSION) {
+                sessionTextBox.value = event.newValue;
+            }
+        }
+        function deleteWebStorage() {
+            localStorage.removeItem(NAME);
+            localStorage.removeItem(COMMENT);
+        }
+        // ストレージからコメントを取得してエレメントに設定
+        // インターフェイスが同じなので、呼出元のストレージ次第で処理は同じ
+        function setComment(storage, element) {
+            var text = storage.getItem(COMMENT);
+            element.value = text;
+        }
+    </script>
+</body>
+</html>
